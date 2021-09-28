@@ -1,3 +1,4 @@
+from unittest import TestCase
 class FieldElement:
 	def __init__(self, num, prime):
 		if num >= prime or num < 0:
@@ -59,8 +60,7 @@ class Point:
 			raise ValueError('({}, {}) is not on the curve'.format(x,y ))
 
 	def __eq__(self, other):
-		return self.x == other.x and self.y == other.y \
-		and self.a == other.a and self.b == other.b
+		return self.x == other.x and self.y == other.y and self.a == other.a and self.b == other.b
 
 	def __ne__(self, other):
 		return not (self == other)
@@ -79,13 +79,13 @@ class Point:
 		if self.x != other.x:
 			s = (other.y - self.y) / (other.x - self.x)
 			x3 = s**2 - self.x - other.x
-			y3 = s(self.x - x3) - self.y
+			y3 = s * (self.x - x3) - self.y
 			return self.__class__(x3, y3, self.a, self.b)
 
 		if self == other:
-			s = (3 * self.x**2 + self.a) / (2* self.y)
-			x3 = s**2 - 2* self.x
-			y3 = s (self.x - x3) - self.y
+			s = (3 * (self.x**2) + self.a) / (2 * self.y)
+			x3 = s**2 - 2  * self.x
+			y3 = s * (self.x - x3) - self.y
 			return self.__class__(x3, y3, self.a, self.b)
 
 		if self == other and self.y  == 0 * self.x:
@@ -112,6 +112,23 @@ class ECCTest(TestCase):
 			y = FieldElement(y_raw, prime)
 			with self.assertRaises(ValueError):
 				Point(x,y,a,b)
+
+	def test_add(self):
+		prime = 223
+		a = FieldElement(0, prime)
+		b = FieldElement(7, prime)
+
+		additions = (
+			(192, 105, 17, 56, 170, 142),
+			(170, 142, 60, 139, 220, 181),
+			(47, 71, 17, 56, 215, 68),
+			(143, 98, 76, 66, 47, 71))
+
+		for x1,y1,x2,y2,x3,y3 in additions:
+			p1 = Point(FieldElement(x1,prime), FieldElement(y1,prime), a, b)
+			p2 = Point(FieldElement(x2, prime), FieldElement(y2, prime), a, b)
+			p3 = Point(FieldElement (x3, prime), FieldElement(y3, prime), a, b)
+			self.assertEqual(p1+p2, p3)
 
 
 
