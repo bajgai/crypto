@@ -47,6 +47,10 @@ class FieldElement:
 		num = self.num * pow(other.num, self.prime-2, self.prime) % self.prime
 		return self.__class__(num, self.prime)
 
+	def __rmul__(self, coefficient):
+		num = (self.num *coefficient) % self.prime
+		return self.__class__(num= num, prime = self.prime)
+
 
 class Point:
 	def __init__(self, x, y, a, b):
@@ -64,6 +68,14 @@ class Point:
 
 	def __ne__(self, other):
 		return not (self == other)
+
+	def __repr__(self):
+		if self.x is None:
+			return 'Point(infinity)'
+		elif isinstance(self.x, FieldElement):
+			return 'Point({}, {})_{}_{} FieldElement({})'.format(self.x.num, self.y.num, self.a.num, self.b.num, self.x.prime)
+		else:
+			return 'Point({}, {})_{}_{}'.format(self.x, self.y, self.a, self.b)
 	
 	def __add__(self, other):
 		if self.a != other.a or self.b != other.b:
@@ -90,7 +102,6 @@ class Point:
 
 		if self == other and self.y  == 0 * self.x:
 			return self.__class__(None, None, self.a, self.b)
-
 
 
 class ECCTest(TestCase):
