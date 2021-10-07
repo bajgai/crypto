@@ -31,4 +31,16 @@ def ex4():
 	for i in range(20):
 		ans += p
 	print ("21*(47,71) is : {}".format(ans))
-	
+
+def ex5():
+	prime = 223
+	a = FE(0, prime)
+	b = FE(7, prime)
+	p = P(FE(15, prime), FE(86, prime), a, b)
+	new_point = p
+	counter = 1
+	while new_point.x != None:
+		new_point += p
+		counter += 1
+	return counter
+		
