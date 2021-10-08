@@ -37,10 +37,10 @@ def ex5():
 	a = FE(0, prime)
 	b = FE(7, prime)
 	p = P(FE(15, prime), FE(86, prime), a, b)
-	new_point = p
+
+	point = p
 	counter = 1
-	while new_point.x != None:
-		new_point += p
+	while point.x != None:
+		point += p
 		counter += 1
 	return counter
-		
