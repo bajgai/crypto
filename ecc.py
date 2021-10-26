@@ -1,4 +1,5 @@
 from unittest import TestCase
+from random import randint
 class FieldElement:
 	def __init__(self, num, prime):
 		if num >= prime or num < 0:
@@ -126,6 +127,9 @@ class S256Field(FieldElement):
 A = 0
 B = 7
 N = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141
+G = S256Point(
+		0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798,
+        0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8)	
 
 class S256Point(Point):
 	def __init__(self, x, y, a = None, b = None):
@@ -144,10 +148,38 @@ class S256Point(Point):
 		v = sig.r * s_inv % N
 		total = u * G + v * self
 		return total.x.num == sig.r
-			
-G = S256Point(
-		0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798,
-        0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8)	
+
+class PrivateKey:
+	def __init__(self, secret):
+		self.secret = secret
+		self.point = secret * G
+
+	def hex(self):
+		return '{:x}'.format(self.secret).zfill(64)
+
+	def sig(self, z):
+		k = randint(0, N)
+		r = (k*G).x.num
+		k_inv = pow(k,N-2,N)
+		s = (z + r * e) * k_inv % N
+		if s > N/2:
+			s = N - s
+		return Signature(r,s)
+
+	def deterministic_k(self, z):
+		k = b'\x00'*32
+		v = b'\x01'*32
+
+		if z > N:
+			z -= N
+		z_bytes = z.to_bytes(32, 'big')
+		secret_bytes = self.secret.to_bytes(32, 'big')
+		s256 = hashlib.sha256
+		k = hmac.new(k, v+'b\x00'+secret_bytes+z_bytes, s256).digest()
+		v = hmac.new(k, v, s256).digest()
+		k = hmac.new (k, v+'b\x01'+secret_bytes+z_bytes, s256).digest()
+
+
 
 class Signature:
 	def __init__(self, r, s):
