@@ -124,13 +124,6 @@ class S256Field(FieldElement):
 
 	def __repr__(self):
 		return '{:x}'.format(self.num).zfill(64)
-A = 0
-B = 7
-N = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141
-G = S256Point(
-		0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798,
-        0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8)	
-
 class S256Point(Point):
 	def __init__(self, x, y, a = None, b = None):
 		a, b = S256Field(A), S256Field(B)
@@ -148,6 +141,22 @@ class S256Point(Point):
 		v = sig.r * s_inv % N
 		total = u * G + v * self
 		return total.x.num == sig.r
+
+	def sec(self, compressed=True):
+		'''returns the binary version of the SEC format'''
+		if compressed:
+			if self.y.num % 2 == 0:
+				return b'\x02' + self.x.num.to_bytes(32, 'big')
+			else:
+				return b'\x03' + self.x.num.to_bytes(32, 'big')
+		return b'\x04' + self.x.num.to_bytes(32, 'big')+self.y.num.to_bytes(32, 'big')
+
+A = 0
+B = 7
+N = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141
+G = S256Point(
+		0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798,
+        0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8)	
 
 class PrivateKey:
 	def __init__(self, secret):
