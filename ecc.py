@@ -104,6 +104,10 @@ class Point:
 		if self == other and self.y  == 0 * self.x:
 			return self.__class__(None, None, self.a, self.b)
 
+		@classmethod
+		def parse(self, sec_bin):
+			'''returns a Point from a SEC binary (noot hex)'''
+
 	def __rmul__(self, coefficient):
 		coef = coefficient
 		current = self
@@ -115,6 +119,9 @@ class Point:
 			coef >>= 1
 		return result
 
+	@classmethod
+
+
 
 P = 2**256 - 2**32 - 977
 
@@ -124,6 +131,9 @@ class S256Field(FieldElement):
 
 	def __repr__(self):
 		return '{:x}'.format(self.num).zfill(64)
+
+	def sqrt(self):
+		return self**((P + 1)// 4)
 class S256Point(Point):
 	def __init__(self, x, y, a = None, b = None):
 		a, b = S256Field(A), S256Field(B)
