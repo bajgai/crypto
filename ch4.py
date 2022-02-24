@@ -11,6 +11,8 @@ def ex1():
 	P3 = PrivateKey(0xdeadbeef12345)
 	print(P3.point.sec(compressed = False).hex())
 
+def ex2():
+	
 
 
 

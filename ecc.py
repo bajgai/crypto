@@ -104,9 +104,7 @@ class Point:
 		if self == other and self.y  == 0 * self.x:
 			return self.__class__(None, None, self.a, self.b)
 
-		@classmethod
-		def parse(self, sec_bin):
-			'''returns a Point from a SEC binary (noot hex)'''
+
 
 	def __rmul__(self, coefficient):
 		coef = coefficient
@@ -119,7 +117,7 @@ class Point:
 			coef >>= 1
 		return result
 
-	@classmethod
+	
 
 
 
@@ -134,6 +132,7 @@ class S256Field(FieldElement):
 
 	def sqrt(self):
 		return self**((P + 1)// 4)
+
 class S256Point(Point):
 	def __init__(self, x, y, a = None, b = None):
 		a, b = S256Field(A), S256Field(B)
@@ -160,6 +159,34 @@ class S256Point(Point):
 			else:
 				return b'\x03' + self.x.num.to_bytes(32, 'big')
 		return b'\x04' + self.x.num.to_bytes(32, 'big')+self.y.num.to_bytes(32, 'big')
+
+	@classmethod
+	def parse(self,sec_bin):
+		'''returns a Point object from a SEC binary (not hex)'''
+		if sec_bin[0] == 4:
+			x = int.from_bytes(sec_bin[1:33], 'big')
+			y = int.from_bytes(sec_bin[33:65], 'big')
+			return S256Point(x = x, y =y)
+		is_even = sec_bin[0] == 2
+		x = S256Field(int.from_bytes(sec_bin(1:), 'big'))
+		
+		#right side of the equation y^2 = X^3 +7
+		alpha = x**3 + S256Field(B)
+
+		#solve for left side
+		beta = alpha.sqrt()
+
+		if beta.num % 2 == 0:
+			even_beta = beta
+			odd_beta = S256Field(P - beta.num)
+		else:
+			even_beta = S256Field(P - beta.num)
+			odd_beta = beta
+		if is_even:
+			return S256Point(x, even_beta)
+		else:
+			return S256Point(x, odd_beta)
+
 
 A = 0
 B = 7
