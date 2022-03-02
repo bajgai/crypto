@@ -168,7 +168,7 @@ class S256Point(Point):
 			y = int.from_bytes(sec_bin[33:65], 'big')
 			return S256Point(x = x, y =y)
 		is_even = sec_bin[0] == 2
-		x = S256Field(int.from_bytes(sec_bin(1:), 'big'))
+		x = S256Field(int.from_bytes(sec_bin[1:], 'big'))
 		
 		#right side of the equation y^2 = X^3 +7
 		alpha = x**3 + S256Field(B)
