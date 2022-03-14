@@ -243,6 +243,32 @@ class Signature:
 	def __rper__(self):
 		return('Signature({:x},{:x})'.format(self.r,self.s))
 
+	def der(self):
+		rbin = self.r.to_bytes(32, byteorder = 'big')
+
+		#remove all the null byte at the begining
+		rbin = rbin.lstrip(b'\x00')
+
+		#if rbin has a high bit, add a \x00
+		if rbin[0] & 0x80:
+			rbin = b'\x00' + rbin
+
+		result = bytes([2, len(rbin)]) + rbin
+		sbin = self.s.to_bytes(32, byteorder = 'big')
+
+		#remove all null bytes at the beginning
+		sbin = sbin.lstrip(b'\x00')
+
+		#if sbin has a high bit, add a \x00
+		if sbin[0] & 0x80:
+			sbin = b'\x00' + sbin
+
+		result += bytes([2, len(sbin)]) + sbin
+
+		return bytes([0x30, len(result)]) + result 
+
+
+
 class ECCTest(TestCase):
 
 	def test_on_curve(self):
