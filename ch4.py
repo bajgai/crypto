@@ -1,5 +1,6 @@
 from ecc import PrivateKey
 from ecc import Signature
+from helper import encode_base58
 
 def ex1():
 	
@@ -29,8 +30,10 @@ def ex3():
 	s = 0x8ca63759c1157ebeaec0d03cecca119fc9a75bf8e6d0fa65c841c8e2738cdaec
 	sig = Signature(r,s)
 	print(sig.der().hex())
-	
 
+def ex4():
+	a = '7c076ff316692a3d7eb3c3bb0f8b1488cf72e1afcd929e29307032997a838a3d'
+	print(encode_base58(bytes.fromhex(h)))
 
 
 
